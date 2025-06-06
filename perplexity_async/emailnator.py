@@ -88,8 +88,8 @@ class Emailnator(AsyncMixin):
             for msg in (await self.s.post('https://www.emailnator.com/message-list', json={'email': self.email})).json()['messageData']:
                 if msg['messageID'] not in self.inbox_ads and msg not in self.inbox:
                     self.new_msgs.append(msg)
-                    
-                    if wait_for(msg):
+
+                    if wait_for and wait_for(msg):
                         wait_for_found = True
             
             if (wait and not self.new_msgs) or wait_for:
