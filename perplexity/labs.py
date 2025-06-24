@@ -12,9 +12,12 @@ import json
 import time
 import socket
 import random
+import logging
 from threading import Thread
 from curl_cffi import requests
 from websocket import WebSocketApp
+
+logger = logging.getLogger(__name__)
 
 class LabsClient:
     '''
@@ -69,7 +72,7 @@ class LabsClient:
             cookie='; '.join([f'{key}={value}' for key, value in self.session.cookies.get_dict().items()]),
             on_open=lambda ws: (ws.send('2probe'), ws.send('5')),
             on_message=self._on_message,
-            on_error=lambda ws, error: print(f'Websocket Error: {error}'),
+            on_error=lambda ws, error: logger.error('WebSocket Error: %s', error),
             socket=self.sock
         )
 
