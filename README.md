@@ -46,6 +46,19 @@ To use your own Chrome instance, enable remote debugging (it may enter dead loop
 cli.run(rf'C:\\Users\\{os.getlogin()}\\AppData\\Local\\Google\\Chrome\\User Data', port=9222)
 ```
 
+### FastAPI Web Server
+
+This repository also contains a simple FastAPI server that exposes the library over HTTP and serves the bundled web interface.
+
+Run it with:
+
+```bash
+pip install -r requirements.txt
+uvicorn webapp.app:app --reload
+```
+
+Open `http://localhost:8000` to access the interface.
+
 ### API Usage
 
 #### Synchronous API

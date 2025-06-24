@@ -1,1 +1,6 @@
 curl_cffi
+
+fastapi
+uvicorn
+jinja2
+websocket-client

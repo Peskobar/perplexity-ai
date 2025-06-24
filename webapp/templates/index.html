@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pl" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demokratyzator AI - Witamy</title>
+    
+    <!-- Bootstrap CSS z motywem Replit -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <!-- Custom CSS -->
+    <link href="/static/css/style.css" rel="stylesheet">
+    
+    
+</head>
+<body>
+    <!-- Nawigacja -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <i data-feather="cpu" class="me-2"></i>
+                <strong>Demokratyzator AI</strong>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i data-feather="log-in" class="me-1"></i>Zaloguj się
+                        </a>
+                    </li>
+                </ul>
+                
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Komunikaty Flash -->
+    
+        
+    
+    
+    <!-- Główna zawartość -->
+    <main>
+        
+<div class="min-vh-100 d-flex align-items-center">
+    <div class="container">
+        
+        <!-- Strona powitalna dla niezalogowanych -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Hero Section -->
+                <div class="text-center mb-5">
+                    <div class="mb-4">
+                        <i data-feather="cpu" style="width: 80px; height: 80px;" class="text-primary"></i>
+                    </div>
+                    <h1 class="display-4 fw-bold mb-4">Demokratyzator AI</h1>
+                    <p class="lead text-muted mb-4">
+                        Otwarta platforma agregująca najlepsze modele AI w jednym miejscu. 
+                        Uzyskaj dostęp do ChatGPT, Claude, Gemini, DeepSeek i lokalnych modeli 
+                        przez jeden prosty interfejs.
+                    </p>
+                </div>
+                
+                <!-- Funkcje -->
+                <div class="row mb-5">
+                    <div class="col-md-3 text-center mb-4">
+                        <div class="mb-3">
+                            <i data-feather="message-circle" style="width: 48px; height: 48px;" class="text-info"></i>
+                        </div>
+                        <h5>Ujednolicony Chat</h5>
+                        <p class="text-muted small">
+                            Jeden interfejs do wszystkich modeli AI. 
+                            Przełączaj między GPT-4, Claude, Gemini bez opuszczania aplikacji.
+                        </p>
+                    </div>
+                    <div class="col-md-3 text-center mb-4">
+                        <div class="mb-3">
+                            <i data-feather="key" style="width: 48px; height: 48px;" class="text-warning"></i>
+                        </div>
+                        <h5>Zarządzanie Sesjami</h5>
+                        <p class="text-muted small">
+                            Automatyczne zarządzanie cookies i API keys. 
+                            Bezpieczne przechowywanie danych uwierzytelniających.
+                        </p>
+                    </div>
+                    <div class="col-md-3 text-center mb-4">
+                        <div class="mb-3">
+                            <i data-feather="server" style="width: 48px; height: 48px;" class="text-success"></i>
+                        </div>
+                        <h5>Lokalne Modele</h5>
+                        <p class="text-muted small">
+                            Obsługa Llama, Mistral, Bielik i innych modeli lokalnych. 
+                            Instalacja jednym kliknięciem.
+                        </p>
+                    </div>
+                    <div class="col-md-3 text-center mb-4">
+                        <div class="mb-3">
+                            <i data-feather="code" style="width: 48px; height: 48px;" class="text-danger"></i>
+                        </div>
+                        <h5>Narzędzia Dev</h5>
+                        <p class="text-muted small">
+                            Ekstraktowanie kodu z Markdown, 
+                            obfuskacja projektów, eksport do ZIP.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Formularz logowania/rejestracji -->
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <!-- Tabs -->
+                                <ul class="nav nav-tabs nav-justified mb-4" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="login-tab" data-bs-toggle="tab" 
+                                                data-bs-target="#login" type="button" role="tab">
+                                            <i data-feather="log-in" class="me-2"></i>Logowanie
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="register-tab" data-bs-toggle="tab" 
+                                                data-bs-target="#register" type="button" role="tab">
+                                            <i data-feather="user-plus" class="me-2"></i>Rejestracja
+                                        </button>
+                                    </li>
+                                </ul>
+                                
+                                <div class="tab-content">
+                                    <!-- Logowanie -->
+                                    <div class="tab-pane fade show active" id="login" role="tabpanel">
+                                        <form method="POST" action="/login">
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">Nazwa użytkownika</label>
+                                                <input type="text" class="form-control" id="username" name="username" required>
+                                            </div>
+                                            <div class="mb-4">
+                                                <label for="password" class="form-label">Hasło</label>
+                                                <input type="password" class="form-control" id="password" name="password" required>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary w-100">
+                                                <i data-feather="log-in" class="me-2"></i>Zaloguj się
+                                            </button>
+                                        </form>
+                                    </div>
+                                    
+                                    <!-- Rejestracja -->
+                                    <div class="tab-pane fade" id="register" role="tabpanel">
+                                        <form method="POST" action="/register">
+                                            <div class="mb-3">
+                                                <label for="reg_username" class="form-label">Nazwa użytkownika</label>
+                                                <input type="text" class="form-control" id="reg_username" name="username" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="email" name="email" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="reg_password" class="form-label">Hasło</label>
+                                                <input type="password" class="form-control" id="reg_password" name="password" required>
+                                            </div>
+                                            <div class="mb-4">
+                                                <label for="password_confirm" class="form-label">Potwierdź hasło</label>
+                                                <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+                                            </div>
+                                            <button type="submit" class="btn btn-success w-100">
+                                                <i data-feather="user-plus" class="me-2"></i>Utwórz konto
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informacje dodatkowe -->
+                <div class="text-center mt-5">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6 class="text-info">
+                                <i data-feather="shield" class="me-2"></i>Bezpieczeństwo
+                            </h6>
+                            <p class="text-muted small">
+                                Wszystkie dane sesji są szyfrowane. 
+                                Nie przechowujemy haseł do zewnętrznych serwisów.
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-success">
+                                <i data-feather="zap" class="me-2"></i>Wydajność
+                            </h6>
+                            <p class="text-muted small">
+                                Optymalizowane dla szybkości. 
+                                Automatyczne zarządzanie połączeniami i cache.
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-warning">
+                                <i data-feather="github" class="me-2"></i>Open Source
+                            </h6>
+                            <p class="text-muted small">
+                                Kod źródłowy dostępny publicznie. 
+                                Możliwość self-hostingu i modyfikacji.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+    </main>
+    
+    <!-- Stopka -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="mb-3">
+                        <i data-feather="cpu" class="me-2"></i>
+                        Demokratyzator AI
+                    </h6>
+                    <p class="text-muted">
+                        Otwarta platforma agregująca modele AI w jednym miejscu. 
+                        Demokratyzujemy dostęp do sztucznej inteligencji.
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="mb-3">Funkcje</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li><i data-feather="check" class="me-2"></i>Ujednolicony interfejs chat</li>
+                        <li><i data-feather="check" class="me-2"></i>Zarządzanie cookies i API keys</li>
+                        <li><i data-feather="check" class="me-2"></i>Lokalne modele AI</li>
+                        <li><i data-feather="check" class="me-2"></i>Narzędzia deweloperskie</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <small class="text-muted">
+                        © 2024 Demokratyzator AI. Projekt open-source.
+                    </small>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <small class="text-muted">
+                        Wersja 1.0.0 | 
+                        <a href="#" class="text-muted text-decoration-none">Dokumentacja</a> |
+                        <a href="#" class="text-muted text-decoration-none">GitHub</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Inicjalizacja ikon -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+        });
+    </script>
+    
+    <!-- Custom JS -->
+    <script src="/static/js/main.js"></script>
+    
+    
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Aktualizuj ikony po przełączaniu tabów
+    const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+    tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function() {
+            feather.replace();
+        });
+    });
+    
+    // Walidacja formularza rejestracji
+    const registerForm = document.querySelector('#register form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+            const password = document.getElementById('reg_password').value;
+            const confirmPassword = document.getElementById('password_confirm').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Hasła nie są identyczne!');
+                return false;
+            }
+            
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('Hasło musi mieć co najmniej 6 znaków!');
+                return false;
+            }
+        });
+    }
+});
+</script>
+
+</body>
+</html>
