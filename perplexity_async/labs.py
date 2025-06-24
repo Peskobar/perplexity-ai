@@ -3,9 +3,12 @@ import json
 import socket
 import random
 import asyncio
+import logging
 from threading import Thread
 from curl_cffi import requests
 from websocket import WebSocketApp, WebSocketException
+
+logger = logging.getLogger(__name__)
 
 
 class AsyncMixin:
@@ -84,9 +87,9 @@ class LabsClient(AsyncMixin):
             while not (self.ws.sock and self.ws.sock.connected):
                 await asyncio.sleep(0.01)
         except (requests.RequestException, WebSocketException, socket.error, ssl.SSLError) as e:
-            print(f"Initialization error: {e}")
+            logger.error("Initialization error: %s", e)
         except Exception as e:
-            print(f"Unexpected error during initialization: {e}")
+            logger.error("Unexpected error during initialization: %s", e)
 
     def _on_message(self, ws, message):
         '''
@@ -102,15 +105,15 @@ class LabsClient(AsyncMixin):
                 if 'final' in response:
                     self.last_answer = response
         except json.JSONDecodeError as e:
-            print(f"JSON decode error: {e}")
+            logger.error("JSON decode error: %s", e)
         except Exception as e:
-            print(f"Unexpected error in message handler: {e}")
+            logger.error("Unexpected error in message handler: %s", e)
 
     def _on_error(self, ws, error):
         '''
         Websocket error handler
         '''
-        print(f'Websocket Error: {error}')
+        logger.error('Websocket Error: %s', error)
 
     async def ask(self, query, model='r1-1776', stream=False):
         '''
@@ -162,8 +165,8 @@ class LabsClient(AsyncMixin):
                 
                 await asyncio.sleep(0.01)
         except AssertionError as e:
-            print(f"Assertion error: {e}")
+            logger.error("Assertion error: %s", e)
         except WebSocketException as e:
-            print(f"WebSocket error: {e}")
+            logger.error("WebSocket error: %s", e)
         except Exception as e:
-            print(f"Unexpected error in ask method: {e}")
+            logger.error("Unexpected error in ask method: %s", e)
