@@ -8,14 +8,16 @@
 # playwright.sync_api: Synchronous Playwright API for browser automation
 # patchright.sync_api: Synchronous Patchright API for undetected browser automation
 import re
-import json
 import time
 from threading import Thread
 from urllib.parse import unquote
 from curl_cffi import requests
+import logging
 from playwright.sync_api import sync_playwright
 from patchright.sync_api import sync_playwright as sync_patchright
 from .emailnator import Emailnator
+
+logger = logging.getLogger(__name__)
 
 class Driver:
     '''
@@ -42,7 +44,7 @@ class Driver:
 
         while True:
             if not self.new_account_link:
-                print('Creating new account')
+                logger.info('Creating new account')
 
                 while True:
                     try:
@@ -67,12 +69,12 @@ class Driver:
                                 msg = emailnator_cli.get(func=lambda x: x['subject'] == 'Sign in to Perplexity')
                                 self.new_account_link = self.signin_regex.search(emailnator_cli.open(msg['messageID'])).group(1)
 
-                                print('New account created\n')
+                                logger.info('New account created')
                                 break
 
                     except Exception as e:
-                        print('Account creation error', e)
-                        print('Renewing emailnator cookies')
+                        logger.error('Account creation error: %s', e)
+                        logger.info('Renewing emailnator cookies')
 
                         # Reset Emailnator cookies and wait for renewal
                         self.emailnator_cookies = None

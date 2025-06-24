@@ -203,6 +203,16 @@ asyncio.run(test())
 
 <img src="images/emailnator.png">
 
+
+## Project Concept
+
+Additional design details and future development ideas are documented in [docs/CONCEPT_PL.md](docs/CONCEPT_PL.md).
+
+## Contact
+
+For support, see [docs/CONTACT.md](docs/CONTACT.md).
+
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
