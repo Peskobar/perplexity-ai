@@ -31,4 +31,45 @@ Projekt "Perplexity AI - Optymalizacja Dostępu" to zaawansowane narzędzie, kt�
 
 Najszybszym sposobem na uruchomienie aplikacji jest użycie Docker Compose.
 
-1.  **Sklonuj repozytorium:**
+1. **Sklonuj repozytorium:**
+   ```bash
+   git clone <adres_repozytorium>
+   cd perplexity-ai-optymalizacja
+   ```
+2. **Przygotuj plik konfiguracyjny (opcjonalnie):**
+   Utwórz `infra/config.yaml`, aby nadpisać domyślne wartości lub dodać listę proxy.
+3. **Ustaw zmienne w `.env`:**
+   Skonfiguruj `JWT_SECRET_KEY` oraz `PERPLEXITY_COOKIE` i inne wartości opisane w dokumentacji.
+4. **Uruchom kontenery:**
+   ```bash
+   docker compose up -d --build
+   ```
+   Aplikacja będzie dostępna pod `http://localhost`.
+5. **Zatrzymanie aplikacji:**
+   ```bash
+   docker compose down
+   ```
+
+## Lokalne środowisko developerskie
+
+1. Zainstaluj pnpm i zależności:
+   ```bash
+   npm install -g pnpm
+   pnpm install
+   ```
+2. Skonfiguruj zmienne środowiskowe dla backendu (`JWT_SECRET_KEY`, `PERPLEXITY_COOKIE`, itp.).
+3. W terminalach równolegle uruchom backend i frontend:
+   ```bash
+   pnpm --filter ./apps/backend dev
+   pnpm --filter ./apps/frontend dev
+   ```
+
+## Testy i jakość kodu
+
+- Testy Pythona uruchomisz poleceniem `pytest`.
+- Lintowanie i formatowanie kodu: `pnpm lint` oraz `pnpm format`.
+- W przykładowym pipeline CI wykonywane są kroki lint, build oraz testy.
+
+---
+
+Projekt wykorzystuje najnowsze technologie frontendowe i backendowe, dostarczając przyjazny interfejs użytkownika wraz z narzędziami do niezawodnej komunikacji z Perplexity AI.
