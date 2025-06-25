@@ -1,0 +1,1 @@
+from .perplexity_service import SERWIS_PERPLEXITY
