@@ -1,7 +1,7 @@
 Zrozumiałem.
 
 ```
-# Stuktura Katalogów
+# Struktura Katalogów
 # .github/
 #   workflows/
 #     ci.yml

@@ -13,9 +13,13 @@ import random
 import mimetypes
 from uuid import uuid4
 from curl_cffi import requests, CurlMime
+import logging
 
 # Importing Emailnator class for email generation
 from .emailnator import Emailnator
+
+logger = logging.getLogger(__name__)
+
 
 class Client:
     '''
@@ -86,7 +90,7 @@ class Client:
                     if new_msgs:
                         break
                 else:
-                    print('Perplexity account creating error:', resp)
+                    logger.error('Perplexity account creating error: %s', resp)
 
             except Exception:
                 pass
@@ -185,7 +189,7 @@ class Client:
                 'last_backend_uuid': follow_up['backend_uuid'] if follow_up else None,
                 'mode': 'concise' if mode == 'auto' else 'copilot',
                 'model_preference': {
-                    'auto': { None: 'turbo' },
+                    'auto': {None: 'turbo'},
                     'pro': {
                         None: 'pplx_pro',
                         'sonar': 'experimental',
@@ -201,7 +205,7 @@ class Client:
                         'o3-mini': 'o3mini',
                         'claude 3.7 sonnet': 'claude37sonnetthinking'
                     },
-                    'deep research': { None: 'pplx_alpha' }
+                    'deep research': {None: 'pplx_alpha'}
                 }[mode][model],
                 'source': 'default',
                 'sources': sources,

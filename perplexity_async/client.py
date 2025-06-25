@@ -4,10 +4,12 @@ import json
 import random
 import asyncio
 import mimetypes
+import logging
 from uuid import uuid4
 from curl_cffi import requests, CurlMime
-
 from .emailnator import Emailnator
+
+logger = logging.getLogger(__name__)
 
 
 class AsyncMixin:
@@ -84,7 +86,7 @@ class Client(AsyncMixin):
                     if new_msgs:
                         break
                 else:
-                    print('Perplexity account creating error:', resp)
+                    logger.error('Perplexity account creating error: %s', resp)
             
             except Exception:
                 pass
