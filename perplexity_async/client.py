@@ -5,6 +5,9 @@ import random
 import mimetypes
 from uuid import uuid4
 from curl_cffi import requests, CurlMime
+from packages.utils.src.logger import Logger
+from packages.utils.src.cookie_validator import validate_emailnator_cookies
+from packages.utils.src.async_retry import async_retry
 
 from .emailnator import Emailnator
 
@@ -33,6 +36,7 @@ class Client(AsyncMixin):
     A client for interacting with the Perplexity AI API.
     '''
     async def __ainit__(self, cookies={}):
+        self.log = Logger().log
         self.session = requests.AsyncSession(headers={
             'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'accept-language': 'en-US,en;q=0.9',
@@ -63,30 +67,35 @@ class Client(AsyncMixin):
         await self.session.get('https://www.perplexity.ai/api/auth/session')
     
     async def create_account(self, cookies):
-        '''
-        Function to create a new account
-        '''
-        while True:
-            try:
-                emailnator_cli = await Emailnator(cookies)
-                
-                resp = await self.session.post('https://www.perplexity.ai/api/auth/signin/email', data={
+        """Create a new account using Emailnator cookies with retries."""
+        validate_emailnator_cookies(cookies)
+
+        @async_retry(max_retries=3, base_delay=2)
+        async def _attempt():
+            emailnator_cli = await Emailnator(cookies)
+            resp = await self.session.post(
+                'https://www.perplexity.ai/api/auth/signin/email',
+                data={
                     'email': emailnator_cli.email,
                     'csrfToken': self.session.cookies.get_dict()['next-auth.csrf-token'].split('%')[0],
                     'callbackUrl': 'https://www.perplexity.ai/',
                     'json': 'true'
-                })
-                
-                if resp.ok:
-                    new_msgs = await emailnator_cli.reload(wait_for=lambda x: x['subject'] == 'Sign in to Perplexity', timeout=20)
-                    
-                    if new_msgs:
-                        break
-                else:
-                    print('Perplexity account creating error:', resp)
-            
-            except Exception:
-                pass
+                }
+            )
+
+            if not resp.ok:
+                self.log.error("Perplexity account creating error: %s", resp)
+                raise RuntimeError("request failed")
+
+            new_msgs = await emailnator_cli.reload(
+                wait_for=lambda x: x['subject'] == 'Sign in to Perplexity',
+                timeout=20,
+            )
+            if not new_msgs:
+                raise RuntimeError("email not received")
+            return emailnator_cli
+
+        emailnator_cli = await _attempt()
         
         msg = emailnator_cli.get(func=lambda x: x['subject'] == 'Sign in to Perplexity')
         new_account_link = self.signin_regex.search(await emailnator_cli.open(msg['messageID'])).group(1)

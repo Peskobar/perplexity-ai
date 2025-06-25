@@ -11,11 +11,14 @@ import sys
 import json
 import random
 import mimetypes
+import time
 from uuid import uuid4
 from curl_cffi import requests, CurlMime
 
 # Importing Emailnator class for email generation
 from .emailnator import Emailnator
+from packages.utils.src.logger import Logger
+from packages.utils.src.cookie_validator import validate_emailnator_cookies
 
 class Client:
     '''
@@ -23,6 +26,7 @@ class Client:
     '''
 
     def __init__(self, cookies={}):
+        self.log = Logger().log
         # Initialize an HTTP session with default headers and optional cookies
         self.session = requests.Session(headers={
             'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
@@ -62,34 +66,37 @@ class Client:
         self.session.get('https://www.perplexity.ai/api/auth/session')
 
     def create_account(self, cookies):
-        '''
-        Creates a new account using Emailnator cookies.
-        '''
-        while True:
+        """Create a new account using Emailnator cookies with retries."""
+        validate_emailnator_cookies(cookies)
+        attempts = 0
+        while attempts < 3:
             try:
-                # Initialize Emailnator client
                 emailnator_cli = Emailnator(cookies)
+                resp = self.session.post(
+                    'https://www.perplexity.ai/api/auth/signin/email',
+                    data={
+                        'email': emailnator_cli.email,
+                        'csrfToken': self.session.cookies.get_dict()['next-auth.csrf-token'].split('%')[0],
+                        'callbackUrl': 'https://www.perplexity.ai/',
+                        'json': 'true'
+                    }
+                )
 
-                # Send a POST request to initiate account creation
-                resp = self.session.post('https://www.perplexity.ai/api/auth/signin/email', data={
-                    'email': emailnator_cli.email,
-                    'csrfToken': self.session.cookies.get_dict()['next-auth.csrf-token'].split('%')[0],
-                    'callbackUrl': 'https://www.perplexity.ai/',
-                    'json': 'true'
-                })
-
-                # Check if the response is successful
                 if resp.ok:
-                    # Wait for the sign-in email to arrive
-                    new_msgs = emailnator_cli.reload(wait_for=lambda x: x['subject'] == 'Sign in to Perplexity', timeout=20)
-
+                    new_msgs = emailnator_cli.reload(
+                        wait_for=lambda x: x['subject'] == 'Sign in to Perplexity',
+                        timeout=20,
+                    )
                     if new_msgs:
                         break
                 else:
-                    print('Perplexity account creating error:', resp)
-
-            except Exception:
-                pass
+                    self.log.error("Perplexity account creating error: %s", resp)
+            except Exception as e:
+                self.log.error("Account creation attempt failed: %s", e)
+            attempts += 1
+            time.sleep(2)
+        else:
+            raise RuntimeError("Account creation failed after retries")
 
         # Extract the sign-in link from the email
         msg = emailnator_cli.get(func=lambda x: x['subject'] == 'Sign in to Perplexity')

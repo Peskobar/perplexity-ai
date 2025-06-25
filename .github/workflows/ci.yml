@@ -1,0 +1,162 @@
+name: CI/CD Perplexity Optymalizacja
+
+on:
+  push:
+    branches:
+      - main
+    # Wyzwalaj na tagi dla publikacji/deploy (opcjonalnie)
+    # tags:
+    #   - 'v*'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sprawdzenie kodu (Checkout)
+        uses: actions/checkout@v4
+
+      - name: Konfiguracja Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm' # Użyj cache pnpm
+
+      - name: Instalacja zależności pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+          run_install: |
+            - recursive: true
+              args: [--frozen-lockfile]
+
+      - name: Konfiguracja Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pnpm' # Cache Pythona w kontekście pnpm workspace
+
+      - name: Instalacja zależności Pythona (Backend)
+        run: pip install -r apps/backend/requirements.txt
+
+      # - name: Uruchom testy Backend (jeśli masz)
+      #   run: cd apps/backend && pytest
+
+      - name: Uruchom linting (ESLint, Pyright, itp.)
+        run: pnpm lint
+
+      - name: Uruchom formatowanie (Prettier)
+        run: pnpm format --check
+
+      - name: Uruchom testy
+        run: pytest --cov=./packages --cov=perplexity --cov=perplexity_async
+
+      - name: Zbuduj projekt (TurboRepo)
+        run: pnpm build
+
+      # Opcjonalnie: Uruchom testy E2E (Playwright w Dockerze)
+      # - name: Ustawienie Playwright
+      #   run: cd apps/frontend && pnpm exec playwright install --with-deps
+
+      # - name: Uruchom testy E2E
+      #   run: pnpm test:e2e # Potrzebujesz skryptu 'test:e2e' w głównym package.json TurboRepo
+
+  # Przykład joba do zbudowania obrazów Docker
+  build-docker-images:
+    runs-on: ubuntu-latest
+    needs: build-and-test # Uruchom po pomyślnym buildzie i testach
+    steps:
+      - name: Sprawdzenie kodu
+        uses: actions/checkout@v4
+
+      - name: Logowanie do DockerHub (lub innego rejestru)
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Ustawienie zmiennych Dockera (tagi, shasum)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: twoj_uzytkownik_dockera/perplexity-optymalizacja
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,enable=true,prefix={{branch}}-,suffix=
+
+      - name: Zbuduj i wypchnij obraz Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/backend
+          file: ./apps/backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Zbuduj i wypchnij obraz Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/frontend
+          file: ./apps/frontend/Dockerfile # Załóżmy, że frontend też ma Dockerfile (np. serwowanie przez Nginx)
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # W przypadku frontendu budowanego przez Vite i serwowanego statycznie,
+          # Dockerfile mógłby kopiować build z hosta.
+          # W Docker compose build odbywa się w tle, tu budujemy obraz do rejestru.
+          # Trzeba skopiować pliki wynikowe buildu z apps/frontend/dist
+          # Przykład: COPY --from=builder /app/dist /usr/share/nginx/html
+          # W tej konfiguracji Dockerfile frontendu musi zbudować aplikację lub skopiować build z poprzedniego kroku CI.
+          # Lepszym podejściem w monorepo jest zbudowanie frontendu w jobie build-and-test,
+          # a następnie skopiowanie wyników do kontekstu Dockerfile.
+          # Ale do uproszczenia, zakładamy, że Dockerfile frontendu sam buduje.
+
+  # Przykład joba do Deploy (np. do VPS z Docker Compose)
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-docker-images # Uruchom po zbudowaniu obrazów
+    environment:
+      name: Produkcja # lub Staging
+    steps:
+      - name: Sprawdzenie kodu
+        uses: actions/checkout@v4
+
+      - name: Skopiuj pliki na serwer przez SSH
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "infra/*,apps/backend/Dockerfile,apps/backend/requirements.txt,apps/backend/app,packages,README.md" # Pliki potrzebne na serwerze
+          target: "~/perplexity-optymalizacja" # Docelowy katalog na serwerze
+
+      - name: Zdalne uruchomienie Docker Compose
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/perplexity-optymalizacja
+            # Ustaw zmienne środowiskowe na serwerze lub użyj pliku .env
+            export DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}
+            export REDIS_URL=${{ secrets.PROD_REDIS_URL }}
+            export JWT_SECRET_KEY=${{ secrets.PROD_JWT_SECRET_KEY }}
+            export PERPLEXITY_COOKIE=${{ secrets.PROD_PERPLEXITY_COOKIE }}
+            export LOG_LEVEL=${{ secrets.PROD_LOG_LEVEL }}
+
+            # Zaciągnij najnowsze obrazy (jeśli używasz rejestru)
+            docker compose pull
+
+            # Uruchom kontenery w trybie detached, przebudowując jeśli potrzebne
+            # Upewnij się, że frontend jest zbudowany lokalnie przed skopiowaniem lub zrób to w Dockerfile frontendu
+            docker compose up -d --build backend nginx
+
+            # Oczyść stare obrazy
+            docker image prune -f
