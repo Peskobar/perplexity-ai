@@ -2,7 +2,6 @@ import re
 import sys
 import json
 import random
-import asyncio
 import mimetypes
 from uuid import uuid4
 from curl_cffi import requests, CurlMime

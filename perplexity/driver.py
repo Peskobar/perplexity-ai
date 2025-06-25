@@ -8,7 +8,6 @@
 # playwright.sync_api: Synchronous Playwright API for browser automation
 # patchright.sync_api: Synchronous Patchright API for undetected browser automation
 import re
-import json
 import time
 from threading import Thread
 from urllib.parse import unquote
