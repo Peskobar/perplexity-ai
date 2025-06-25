@@ -1,208 +1,78 @@
-# Perplexity AI
+# Perplexity AI - Optymalizacja Dostępu w Szarej Strefie
+[![CI](https://github.com/Peskobar/perplexity-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/Peskobar/perplexity-ai/actions/workflows/ci.yml)
 
-Perplexity AI is a Python module that leverages [Emailnator](https://emailnator.com/) to generate new accounts for unlimited pro queries. It supports both synchronous and asynchronous APIs, as well as a web interface for users who prefer a GUI-based approach.
+## Wprowadzenie
 
-## Features
+Projekt "Perplexity AI - Optymalizacja Dostępu" to zaawansowane narzędzie, które ma na celu zapewnić bardziej stabilny, wydajny i kontrolowany dostęp do możliwości Perplexity AI, nawet w warunkach ograniczonej łączności lub specyficznych wymagań. Zbudowany jako nowoczesna aplikacja webowa (dashboard), umożliwia użytkownikom interakcję z AI poprzez przyjazny interfejs, jednocześnie implementując mechanizmy takie jak cache, limitowanie zapytań, ponawianie prób i monitorowanie stanu serwisu.
 
-- **Account Generation**: Automatically generate Gmail accounts using Emailnator.
-- **Unlimited Pro Queries**: Bypass query limits by creating new accounts.
-- **Web Interface**: Automate account creation and usage via a browser.
-- **API Support**: Synchronous and asynchronous APIs for programmatic access.
+## Cechy
 
-## Installation
+- **Backend FastAPI:** Wydajne API w Pythonie z asynchronicznym przetwarzaniem, WebSocketami i JWT.
+- **Frontend React 19:** Dynamiczny i responsywny interfejs użytkownika z nowoczesnymi bibliotekami (Tailwind 4, Radix UI, shadcn/ui, Framer Motion, React Three Fiber).
+- **Monorepo pnpm + Turbo:** Zoptymalizowana struktura projektu do zarządzania wieloma pakietami i aplikacjami.
+- **Cache:** Buforowanie odpowiedzi AI w pamięci podręcznej w celu szybszego dostępu i redukcji zapytań do zewnętrznego API.
+- **Rate Limiting & Retry:** Kontrola częstotliwości zapytań i automatyczne ponawianie w przypadku błędów.
+- **Proxy Support:** Możliwość wykorzystania listy proxy do routingu zapytań.
+- **Monitoring & Metryki:** Wbudowany monitor zdrowia API i endpoint Prometheus do śledzenia stanu serwisu i wydajności.
+- **Uwierzytelnienie JWT:** Zabezpieczenie dostępu do API za pomocą tokenów JWT.
+- **Onboarding:** Intuicyjny samouczek dla nowych użytkowników.
+- **Command Palette:** Szybki dostęp do funkcji aplikacji za pomocą skrótów klawiaturowych.
+- **Dostępność WCAG:** Projektowanie z myślą o dostępności cyfrowej.
+- **Deployment z Docker Compose:** Łatwe uruchamianie w kontenerach (PostgreSQL, Redis, Backend, Frontend, Nginx).
+- **Automatyzacja CI/CD:** Pipeline GitHub Actions do testowania, budowania i wdrażania.
 
-Install the required packages:
+## Wymagania
 
-```bash
-pip install perplexity-api perplexity-api-async
-```
+- Docker i Docker Compose
+- Node.js (v20+) i pnpm (v8+)
+- Python (v3.11+)
+- Git
 
-For the web interface, install additional dependencies:
+## 1-Click Deploy (Docker Compose)
 
-```bash
-pip install patchright playwright && patchright install chromium
-```
+Najszybszym sposobem na uruchomienie aplikacji jest użycie Docker Compose.
 
-## Usage
+1. **Sklonuj repozytorium:**
+   ```bash
+   git clone <adres_repozytorium>
+   cd perplexity-ai-optymalizacja
+   ```
+2. **Przygotuj plik konfiguracyjny (opcjonalnie):**
+   Utwórz `infra/config.yaml`, aby nadpisać domyślne wartości lub dodać listę proxy.
+3. **Ustaw zmienne w `.env`:**
+   Skonfiguruj `JWT_SECRET_KEY` oraz `PERPLEXITY_COOKIE` i inne wartości opisane w dokumentacji.
+4. **Uruchom kontenery:**
+   ```bash
+   docker compose up -d --build
+   ```
+   Aplikacja będzie dostępna pod `http://localhost`.
+5. **Zatrzymanie aplikacji:**
+   ```bash
+   docker compose down
+   ```
 
-### Web Interface
+## Lokalne środowisko developerskie
 
-The web interface automates account creation and usage in a browser. [Patchright](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright-python#best-practices) uses ["Chrome User Data Directory"](https://www.google.com/search?q=chrome+user+data+directory) to be completely undetected, it's ``C:\Users\YourName\AppData\Local\Google\Chrome\User Data`` for Windows, as shown below:
+1. Zainstaluj pnpm i zależności:
+   ```bash
+   npm install -g pnpm
+   pnpm install
+   ```
+2. Skonfiguruj zmienne środowiskowe dla backendu (`JWT_SECRET_KEY`, `PERPLEXITY_COOKIE`, itp.).
+3. W terminalach równolegle uruchom backend i frontend:
+   ```bash
+   pnpm --filter ./apps/backend dev
+   pnpm --filter ./apps/frontend dev
+   ```
 
-```python
-import os
-from perplexity.driver import Driver
+## Testy i jakość kodu
 
-cli = Driver()
-cli.run(rf'C:\\Users\\{os.getlogin()}\\AppData\\Local\\Google\\Chrome\\User Data')
-```
+- Testy Pythona uruchomisz poleceniem `pytest`.
+- Lintowanie i formatowanie kodu: `pnpm lint` oraz `pnpm format`.
+- W przykładowym pipeline CI wykonywane są kroki lint, build oraz testy.
 
-To use your own Chrome instance, enable remote debugging (it may enter dead loop in Cloudflare):
+---
 
-1. Add `--remote-debugging-port=9222` to Chrome's shortcut target.
-2. Pass the port to the `Driver.run()` method:
+Projekt wykorzystuje najnowsze technologie frontendowe i backendowe, dostarczając przyjazny interfejs użytkownika wraz z narzędziami do niezawodnej komunikacji z Perplexity AI.
 
-```python
-cli.run(rf'C:\\Users\\{os.getlogin()}\\AppData\\Local\\Google\\Chrome\\User Data', port=9222)
-```
-
-### API Usage
-
-#### Synchronous API
-
-Below is an example code for simple usage, without using your own account or generating new accounts.
-
-```python3
-import perplexity
-
-perplexity_cli = perplexity.Client()
-
-# mode = ['auto', 'pro', 'reasoning', 'deep research']
-# model = model for mode, which can only be used in own accounts, that is {
-#     'auto': [None],
-#     'pro': [None, 'sonar', 'gpt-4.5', 'gpt-4o', 'claude 3.7 sonnet', 'gemini 2.0 flash', 'grok-2'],
-#     'reasoning': [None, 'r1', 'o3-mini', 'claude 3.7 sonnet'],
-#     'deep research': [None]
-# }
-# sources = ['web', 'scholar', 'social']
-# files = a dictionary which has keys as filenames and values as file data
-# stream = returns a generator when enabled and just final response when disabled
-# language = ISO 639 code of language you want to use
-# follow_up = last query info for follow-up queries, you can directly pass response from a query, look at second example below
-# incognito = Enables incognito mode, for people who are using their own account
-resp = perplexity_cli.search('Your query here', mode='auto', model=None, sources=['web'], files={}, stream=False, language='en-US', follow_up=None, incognito=False)
-print(resp)
-
-# second example to show how to use follow-up queries and stream response
-for i in perplexity_cli.search('Your query here', stream=True, follow_up=resp):
-    print(i)
-```
-
-And this is how you use your own account, you need to get your cookies in order to use your own account. Look at [How To Get Cookies](#how-to-get-cookies),
-
-```python3
-import perplexity
-
-perplexity_cookies = { 
-    <your cookies here>
-}
-
-perplexity_cli = perplexity.Client(perplexity_cookies)
-
-resp = perplexity_cli.search('Your query here', mode='reasoning', model='o3-mini', sources=['web'], files={'myfile.txt': open('file.txt').read()}, stream=False, language='en-US', follow_up=None, incognito=False)
-print(resp)
-```
-
-And finally account generating, you need to get cookies for [Emailnator](https://emailnator.com/) to use this feature. Look at [How To Get Cookies](#how-to-get-cookies),
-
-```python3
-import perplexity
-
-emailnator_cookies = { 
-    <your cookies here>
-}
-
-perplexity_cli = perplexity.Client()
-perplexity_cli.create_account(emailnator_cookies) # Creates a new gmail, so your 5 pro queries will be renewed.
-
-resp = perplexity_cli.search('Your query here', mode='reasoning', model=None, sources=['web'], files={'myfile.txt': open('file.txt').read()}, stream=False, language='en-US', follow_up=None, incognito=False)
-print(resp)
-```
-
-#### Asynchronous API
-
-Below is an example code for simple usage, without using your own account or generating new accounts.
-
-```python3
-import asyncio
-import perplexity_async
-
-async def test():
-    perplexity_cli = await perplexity_async.Client()
-
-    # mode = ['auto', 'pro', 'reasoning', 'deep research']
-    # model = model for mode, which can only be used in own accounts, that is {
-    #     'auto': [None],
-    #     'pro': [None, 'sonar', 'gpt-4.5', 'gpt-4o', 'claude 3.7 sonnet', 'gemini 2.0 flash', 'grok-2'],
-    #     'reasoning': [None, 'r1', 'o3-mini', 'claude 3.7 sonnet'],
-    #     'deep research': [None]
-    # }
-    # sources = ['web', 'scholar', 'social']
-    # files = a dictionary which has keys as filenames and values as file data
-    # stream = returns a generator when enabled and just final response when disabled
-    # language = ISO 639 code of language you want to use
-    # follow_up = last query info for follow-up queries, you can directly pass response from a query, look at second example below
-    # incognito = Enables incognito mode, for people who are using their own account
-    resp = await perplexity_cli.search('Your query here', mode='auto', model=None, sources=['web'], files={}, stream=False, language='en-US', follow_up=None, incognito=False)
-    print(resp)
-
-    # second example to show how to use follow-up queries and stream response
-    async for i in await perplexity_cli.search('Your query here', stream=True, follow_up=resp):
-        print(i)
-
-asyncio.run(test())
-```
-
-And this is how you use your own account, you need to get your cookies in order to use your own account. Look at [How To Get The Cookies](#how-to-get-the-cookies),
-
-```python3
-import asyncio
-import perplexity_async
-
-perplexity_cookies = { 
-    <your cookies here>
-}
-
-async def test():
-    perplexity_cli = await perplexity_async.Client(perplexity_cookies)
-
-    resp = await perplexity_cli.search('Your query here', mode='reasoning', model='o3-mini', sources=['web'], files={'myfile.txt': open('file.txt').read()}, stream=False, language='en-US', follow_up=None, incognito=False)
-    print(resp)
-
-asyncio.run(test())
-```
-
-And finally account generating, you need to get cookies for [emailnator](https://emailnator.com/) to use this feature. Look at [How To Get The Cookies](#how-to-get-the-cookies),
-
-```python3
-import asyncio
-import perplexity_async
-
-emailnator_cookies = { 
-    <your cookies here>
-}
-
-async def test():
-    perplexity_cli = await perplexity_async.Client()
-    await perplexity_cli.create_account(emailnator_cookies) # Creates a new gmail, so your 5 pro queries will be renewed.
-
-    resp = await perplexity_cli.search('Your query here', mode='reasoning', model=None, sources=['web'], files={'myfile.txt': open('file.txt').read()}, stream=False, language='en-US', follow_up=None, incognito=False)
-    print(resp)
-
-asyncio.run(test())
-```
-
-## How to Get Cookies
-
-### Perplexity (to use your own account)
-* Open [Perplexity.ai](https://perplexity.ai/) website and login to your account.
-* Click F12 or ``Ctrl + Shift + I`` to open inspector.
-* Go to the "Network" tab in the inspector.
-* Refresh the page, right click the first request, hover on "Copy" and click to "Copy as cURL (bash)".
-* Now go to the [CurlConverter](https://curlconverter.com/python/) and paste your code here. The cookies dictionary will appear, copy and use it in your codes.
-
-<img src="images/perplexity.png">
-
-### Emailnator (for account generating)
-* Open [Emailnator](https://emailnator.com/) website and verify you're human.
-* Click F12 or ``Ctrl + Shift + I`` to open inspector.
-* Go to the "Network" tab in the inspector.
-* Refresh the page, right click the first request, hover on "Copy" and click to "Copy as cURL (bash)".
-* Now go to the [CurlConverter](https://curlconverter.com/python/) and paste your code here. The cookies dictionary will appear, copy and use it in your codes.
-* Cookies for [Emailnator](https://emailnator.com/) are temporary, you need to renew them continuously.
-
-<img src="images/emailnator.png">
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+Wspieraj wolne oprogramowanie – dajmy moc społeczności i twórcom! ❤️

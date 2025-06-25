@@ -7,6 +7,7 @@ from uuid import uuid4
 from curl_cffi import requests, CurlMime
 
 from .emailnator import Emailnator
+from packages.utils import Logger, async_retry, CookieValidator
 
 
 class AsyncMixin:
@@ -66,37 +67,35 @@ class Client(AsyncMixin):
         '''
         Function to create a new account
         '''
-        while True:
-            try:
-                emailnator_cli = await Emailnator(cookies)
-                
-                resp = await self.session.post('https://www.perplexity.ai/api/auth/signin/email', data={
-                    'email': emailnator_cli.email,
-                    'csrfToken': self.session.cookies.get_dict()['next-auth.csrf-token'].split('%')[0],
-                    'callbackUrl': 'https://www.perplexity.ai/',
-                    'json': 'true'
-                })
-                
-                if resp.ok:
-                    new_msgs = await emailnator_cli.reload(wait_for=lambda x: x['subject'] == 'Sign in to Perplexity', timeout=20)
-                    
-                    if new_msgs:
-                        break
-                else:
-                    print('Perplexity account creating error:', resp)
-            
-            except Exception:
-                pass
-        
-        msg = emailnator_cli.get(func=lambda x: x['subject'] == 'Sign in to Perplexity')
-        new_account_link = self.signin_regex.search(await emailnator_cli.open(msg['messageID'])).group(1)
-        
-        await self.session.get(new_account_link)
-        
-        self.copilot = 5
-        self.file_upload = 10
-        
-        return True
+        logger = Logger().log
+        CookieValidator.validate(cookies)
+
+        @async_retry(max_retries=3, base_delay=1)
+        async def _create():
+            logger.info('Attempting Perplexity account creation (async)')
+            emailnator_cli = await Emailnator(cookies)
+            resp = await self.session.post('https://www.perplexity.ai/api/auth/signin/email', data={
+                'email': emailnator_cli.email,
+                'csrfToken': self.session.cookies.get_dict()['next-auth.csrf-token'].split('%')[0],
+                'callbackUrl': 'https://www.perplexity.ai/',
+                'json': 'true'
+            })
+            if not resp.ok:
+                raise RuntimeError(f'Perplexity error {resp.status_code}')
+
+            new_msgs = await emailnator_cli.reload(wait_for=lambda x: x['subject'] == 'Sign in to Perplexity', timeout=20)
+            if not new_msgs:
+                raise RuntimeError('No sign-in email received')
+
+            msg = emailnator_cli.get(func=lambda x: x['subject'] == 'Sign in to Perplexity')
+            new_account_link = self.signin_regex.search(await emailnator_cli.open(msg['messageID'])).group(1)
+            await self.session.get(new_account_link)
+            self.copilot = 5
+            self.file_upload = 10
+            logger.info('Perplexity account created successfully')
+            return True
+
+        return await _create()
     
     async def search(self, query, mode='auto', model=None, sources=['web'], files={}, stream=False, language='en-US', follow_up=None, incognito=False):
         '''

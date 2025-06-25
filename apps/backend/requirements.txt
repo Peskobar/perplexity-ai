@@ -1,0 +1,20 @@
+fastapi==0.111.0
+uvicorn==0.29.0
+SQLAlchemy==2.0.29
+psycopg2-binary==2.9.9
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.9
+websockets==12.0
+prometheus_client==0.20.0
+redis==5.0.4
+aiohttp==3.9.5
+asyncio==3.4.3
+cachetools==5.3.3
+curl_cffi==0.6.3
+httpx==0.27.0
+playwright==1.44.0 # Może wymagać dodatkowych zależności systemowych
+PyYAML==6.0.1
+tomli==2.0.1 # Wbudowane w Python 3.11+, ale dodane dla starszych
+llama-cpp-python==0.2.75 # Potrzebuje dodatkowych zależności systemowych i kompilacji
+python-dotenv==1.0.0
