@@ -17,6 +17,7 @@ Projekt "Perplexity AI - Optymalizacja Dostępu" to zaawansowane narzędzie, kt�
 - **Uwierzytelnienie JWT:** Zabezpieczenie dostępu do API za pomocą tokenów JWT.
 - **Onboarding:** Intuicyjny samouczek dla nowych użytkowników.
 - **Command Palette:** Szybki dostęp do funkcji aplikacji za pomocą skrótów klawiaturowych.
+- **Generatory obrazu, dźwięku i wideo:** Proste moduły do tworzenia multimediów.
 - **Dostępność WCAG:** Projektowanie z myślą o dostępności cyfrowej.
 - **Deployment z Docker Compose:** Łatwe uruchamianie w kontenerach (PostgreSQL, Redis, Backend, Frontend, Nginx).
 - **Automatyzacja CI/CD:** Pipeline GitHub Actions do testowania, budowania i wdrażania.
