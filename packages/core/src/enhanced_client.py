@@ -3,8 +3,9 @@ import asyncio
 import uuid
 import json
 import random
-import time # Dodany import time
-import os # Dodany import os
+import time  # Dodany import time
+import os  # Dodany import os
+from typing import Optional, Dict
 
 # Upewnij się, że importujesz z odpowiednich pakietów
 from packages.utils.src.async_rate_limiter import AsyncRateLimiter
@@ -79,7 +80,8 @@ class EnhancedClient:
         proxy_rotation = self.cfg.pobierz("proxy.rotation", True)
         self.proxy_mgr = ProxyManager(proxy_list, proxy_rotation) if proxy_enabled else None
         if proxy_enabled and not proxy_list:
-             # print("OSTRZEŻENIE: Proxy włączone w konfiguracji, ale lista proxy jest pusta.")
+            # print("OSTRZEŻENIE: Proxy włączone w konfiguracji, ale lista proxy jest pusta.")
+            pass
 
         self.session: Optional[aiohttp.ClientSession] = None
         self._session_lock = asyncio.Lock() # Blokada dla inicjalizacji sesji

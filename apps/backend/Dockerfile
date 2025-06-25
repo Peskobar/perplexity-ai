@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Kopiowanie plików projektu
 # Użyj warstwy buforowania - kopiuj tylko pliki zależności najpierw
-COPY requirements.txt .
+COPY ./requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Kopiuj resztę kodu aplikacji i pakietów lokalnych

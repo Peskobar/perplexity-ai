@@ -13,14 +13,13 @@ from perplexity.client import Client
 class DummyEmailnator:
     def __init__(self, cookies):
         self.email = "dummy@example.com"
-    async def reload(self, *args, **kwargs):
-        return [{"messageID": "1", "subject": "Sign in to Perplexity"}]
+
     def reload(self, *args, **kwargs):
         return [{"messageID": "1", "subject": "Sign in to Perplexity"}]
+
     def get(self, func):
         return {"messageID": "1", "subject": "Sign in to Perplexity"}
-    async def open(self, msg_id):
-        return '"https://www.perplexity.ai/api/auth/callback/email?callbackUrl=https://www.perplexity.ai/"'
+
     def open(self, msg_id):
         return '"https://www.perplexity.ai/api/auth/callback/email?callbackUrl=https://www.perplexity.ai/"'
 
