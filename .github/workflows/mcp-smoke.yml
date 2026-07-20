@@ -1,0 +1,58 @@
+name: MCP smoke test
+
+on:
+  pull_request:
+    paths:
+      - "perplexity/**"
+      - "pyproject.toml"
+      - ".github/workflows/mcp-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install package with MCP support
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[mcp]"
+
+      - name: Compile Python sources
+        run: python -m compileall -q perplexity perplexity_async
+
+      - name: Verify response parser without network access
+        run: |
+          python - <<'PY'
+          from perplexity.mcp import _extract_answer, _normalize_cookies
+
+          assert _extract_answer({"answer": "direct"}) == "direct"
+          assert _extract_answer({
+              "blocks": [{
+                  "intended_usage": "ask_text",
+                  "markdown_block": {"answer": "blocks"},
+              }]
+          }) == "blocks"
+          assert _extract_answer({
+              "text": [{
+                  "step_type": "FINAL",
+                  "content": {"answer": "{\"answer\": \"legacy\"}"},
+              }]
+          }) == "legacy"
+          assert _normalize_cookies({"token": "abc"}) == {"token": "abc"}
+          assert _normalize_cookies([
+              {"name": "token", "value": "abc"},
+              {"name": "other", "value": "123"},
+          ]) == {"token": "abc", "other": "123"}
+          print("MCP parser smoke test passed")
+          PY
