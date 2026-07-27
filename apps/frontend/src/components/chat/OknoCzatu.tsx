@@ -28,7 +28,7 @@ const OknoCzatu: React.FC = () => {
       if (fragment === '[KONIEC_STRUMIENIA]') {
         setŁadujeAi(false);
         setWiadomości((poprzednie) => {
-          const ostatnia = poprzednie.at(-1);
+          const ostatnia = poprzednie[poprzednie.length - 1];
           if (!ostatnia || ostatnia.nadawca !== 'ai') return poprzednie;
           return [...poprzednie.slice(0, -1), { ...ostatnia, ładuje: false }];
         });
@@ -36,7 +36,7 @@ const OknoCzatu: React.FC = () => {
       }
 
       setWiadomości((poprzednie) => {
-        const ostatnia = poprzednie.at(-1);
+        const ostatnia = poprzednie[poprzednie.length - 1];
         if (ostatnia?.nadawca === 'ai' && ostatnia.ładuje) {
           return [
             ...poprzednie.slice(0, -1),
@@ -105,9 +105,13 @@ const OknoCzatu: React.FC = () => {
     try {
       const odpowiedz = await sendPerplexityQuery(tekst, token);
       setWiadomości((poprzednie) => {
-        const indeks = poprzednie.findLastIndex(
-          (wiadomosc) => wiadomosc.nadawca === 'ai' && wiadomosc.ładuje,
-        );
+        let indeks = -1;
+        for (let i = poprzednie.length - 1; i >= 0; i -= 1) {
+          if (poprzednie[i].nadawca === 'ai' && poprzednie[i].ładuje) {
+            indeks = i;
+            break;
+          }
+        }
         if (indeks < 0) return poprzednie;
         const wynik = [...poprzednie];
         wynik[indeks] = {
