@@ -81,6 +81,20 @@ def test_current_reasoning_model_mapping_and_follow_up():
     assert params["is_incognito"] is True
 
 
+def test_null_follow_up_attachments_are_treated_as_empty():
+    payload = build_search_payload(
+        "Kontynuuj",
+        mode="auto",
+        model=None,
+        sources=["web"],
+        uploaded_files=["new.pdf"],
+        follow_up={"backend_uuid": "thread-43", "attachments": None},
+    )
+
+    assert payload["params"]["attachments"] == ["new.pdf"]
+    assert payload["params"]["last_backend_uuid"] == "thread-43"
+
+
 def test_rejects_stale_or_unknown_model():
     with pytest.raises(ProtocolError):
         validate_search("pro", "gpt-4o", ["web"])
