@@ -38,11 +38,12 @@ def build_search_payload(
     validate_search(mode, model, sources)
     uploaded_files = list(uploaded_files or [])
     follow_up = follow_up or {}
+    previous_attachments = list(follow_up.get("attachments") or [])
 
     return {
         "query_str": query,
         "params": {
-            "attachments": uploaded_files + list(follow_up.get("attachments", [])),
+            "attachments": uploaded_files + previous_attachments,
             "frontend_context_uuid": str(uuid4()),
             "frontend_uuid": str(uuid4()),
             "is_incognito": incognito,
