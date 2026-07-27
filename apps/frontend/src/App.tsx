@@ -1,38 +1,25 @@
 import React from 'react';
-import { useTheme } from './context/ThemeContext'; // Hook do zarządzania motywem
-import Naglowek from './components/layout/Naglowek'; // Komponent nagłówka
-import Stopka from './components/layout/Stopka';   // Komponent stopki
-import GlownaZawartosc from './components/layout/GlownaZawartosc'; // Komponent głównej zawartości
-import OnboardingDialog from './components/onboarding/OnboardingDialog'; // Komponent dialogu onboardingowego
-import PaletaPolecen from './components/command-palette/PaletaPolecen'; // Komponent palety poleceń
-import Tlo3D from './components/three/Tlo3D'; // Komponent tła 3D (opcjonalnie)
+import { useTheme } from './context/ThemeContext';
+import Naglowek from './components/layout/Naglowek';
+import Stopka from './components/layout/Stopka';
+import GlownaZawartosc from './components/layout/GlownaZawartosc';
+import OnboardingDialog from './components/onboarding/OnboardingDialog';
+import PaletaPolecen from './components/command-palette/PaletaPolecen';
 
 function App() {
-  const { theme } = useTheme(); // Pobierz aktualny motyw
+  const { theme } = useTheme();
 
-  // Zastosuj klasę motywu do elementu body
   React.useEffect(() => {
     document.body.className = theme;
   }, [theme]);
 
   return (
-    <div className="app-kontener flex flex-col min-h-screen">
-      {/* Opcjonalne tło 3D - może być umieszczone w kontenerze o fixed position */}
-      {/* <div className="fixed inset-0 z-0 pointer-events-none">
-        <Tlo3D />
-      </div> */}
-
-      {/* Główna struktura aplikacji */}
+    <div className="app-kontener flex min-h-screen flex-col">
       <Naglowek />
-      <GlownaZawartosc /> {/* Tutaj będą główne widoki, np. czat */}
+      <GlownaZawartosc />
       <Stopka />
-
-      {/* Komponenty globalne/nakładki */}
-      <OnboardingDialog /> {/* Dialog onboardingowy */}
-      <PaletaPolecen /> {/* Paleta poleceń aktywowana hotkeyem */}
-
-      {/* Kontenery shadcn/ui, radix-ui itp. - często dodawane w root/main.tsx */}
-      {/* <Toaster /> // Przykład toastów */}
+      <OnboardingDialog />
+      <PaletaPolecen />
     </div>
   );
 }
