@@ -31,13 +31,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[mcp]" flake8 pytest
 
-      - name: Blokująca kontrola składni
-        run: python -m compileall -q perplexity perplexity_async packages apps/backend tests
+      - name: Blokująca kontrola składni biblioteki
+        run: python -m compileall -q perplexity perplexity_async tests
 
       - name: Raport jakości flake8
         run: |
-          # Repo zawiera starszy kod i warstwę koncepcyjną. Flake8 raportuje
-          # problemy jakościowe, ale nie zastępuje testów ani kompilacji składni.
+          # Starszy szkielet aplikacji jest raportowany, ale nie blokuje zmian
+          # w bibliotece Perplexity/MCP. Błędy składni biblioteki i testy blokują PR.
           flake8 perplexity perplexity_async packages apps/backend tests \
             --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
