@@ -29,17 +29,19 @@
     "vaul": "^0.9.1"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^20.12.12",
     "@types/react": "^19.0.0-rc-f994737d14-20240522",
     "@types/react-dom": "^19.0.0-rc-f994737d14-20240522",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "autoprefixer": "^10.4.20",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
     "postcss": "^8.4.38",
-    "tailwindcss": "^4.0.0-alpha-12",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
   }

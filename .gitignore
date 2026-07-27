@@ -1,0 +1,37 @@
+# Secrets and local sessions
+.env
+.env.*
+!.env.example
+*cookie*.json
+*cookies*.json
+*session*.json
+*.token
+
+# Runtime logs and state
+*.log
+logs/
+.local/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+build/
+dist/
+
+# Node / frontend
+node_modules/
+.pnpm-store/
+.turbo/
+apps/frontend/dist/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
