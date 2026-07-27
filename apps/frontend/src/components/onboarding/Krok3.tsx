@@ -1,35 +1,34 @@
 import React from 'react';
-import { DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import {
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useOnboarding } from '@/context/OnboardingContext';
 
 const Krok3: React.FC = () => {
   const { zakończOnboarding, poprzedniKrok, aktualnyKrok } = useOnboarding();
-
-  // Oblicz wartość paska postępu (na 3 kroki)
   const postęp = (aktualnyKrok / 3) * 100;
 
   return (
     <div className="flex flex-col space-y-4">
       <DialogHeader>
-        <DialogTitle>Krok 3: Statystyki i Monitorowanie</DialogTitle>
+        <DialogTitle>Krok 3: Statystyki i monitorowanie</DialogTitle>
         <DialogDescription>
-          Śledź wykorzystanie systemu i jego stan zdrowia na dedykowanej stronie statystyk.
+          Kontroluj wykorzystanie systemu, cache i stan połączenia z usługą.
         </DialogDescription>
       </DialogHeader>
       <div className="text-sm text-muted-foreground">
-        Możesz monitorować ilość zapytań, trafienia w cache, czas odpowiedzi API oraz ogólny stan
-        zdrowia klienta Perplexity AI dzięki wbudowanemu monitoringowi.
-        To wszystko pomoże zoptymalizować Twoje koszty i wydajność.
-        Jesteś gotów rozpocząć?
+        Panel metryk pokazuje liczbę zapytań, trafienia w cache i czas odpowiedzi,
+        dzięki czemu łatwiej ocenić stabilność oraz koszty działania.
       </div>
-       <div className="w-full">
-        <Progress value={postęp} className="w-full" />
-      </div>
+      <Progress value={postęp} className="w-full" />
       <DialogFooter className="flex justify-between">
-         <Button variant="outline" onClick={poprzedniKrok}>Wstecz</Button>
-        <Button onClick={zakończOnboarding}>Zacznij Korzystać!</Button>
+        <Button variant="outline" onClick={poprzedniKrok}>Wstecz</Button>
+        <Button onClick={zakończOnboarding}>Zacznij korzystać</Button>
       </DialogFooter>
     </div>
   );
