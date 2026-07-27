@@ -35,7 +35,7 @@ MODEL_MAPPINGS = {
     "deep research": {None: "pplx_alpha"},
 }
 
-LOG_FORMAT = "% (asctime)s - %(name)s - %(levelname)s - %(message)s".replace("% ", "%")
+LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 LOG_LEVEL = os.environ.get("PERPLEXITY_LOG_LEVEL", "INFO").upper()
 _STATE_HOME = os.environ.get("XDG_STATE_HOME") or str(Path.home() / ".local" / "state")
 LOG_FILE = os.environ.get(
